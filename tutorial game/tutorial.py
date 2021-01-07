@@ -1,22 +1,56 @@
 import pygame
 pygame.init()
 
-win = pygame.display.set_mode((500, 500))
+win = pygame.display.set_mode((500, 480))
 
 pygame.display.set_caption("Tic Tac Toe")
 
-x = 50
-y = 50
-width = 40
-height = 60
-vel = 5
+walkRight = [pygame.image.load('Images/Player/R1.png'), pygame.image.load('Images/Player/R2.png'),
+             pygame.image.load('Images/Player/R3.png'), pygame.image.load('Images/Player/R4.png'),
+             pygame.image.load('Images/Player/R5.png'), pygame.image.load('Images/Player/R6.png'),
+             pygame.image.load('Images/Player/R7.png'), pygame.image.load('Images/Player/R8.png'),
+             pygame.image.load('Images/Player/R9.png')]
+walkLeft = [pygame.image.load('Images/Player/L1.png'), pygame.image.load('Images/Player/L2.png'),
+            pygame.image.load('Images/Player/L3.png'), pygame.image.load('Images/Player/L4.png'),
+            pygame.image.load('Images/Player/L5.png'), pygame.image.load('Images/Player/L6.png'),
+            pygame.image.load('Images/Player/L7.png'), pygame.image.load('Images/Player/L8.png'),
+            pygame.image.load('Images/Player/L9.png')]
+bg = pygame.image.load('Images/background/bg.jpg')
+char = pygame.image.load('Images/Player/standing.png')
 
+clock = pygame.time.Clock()
+
+x = 0
+y = 416
+width = 64
+height = 64
+vel = 5
 isJump = False
 jumpCount = 10
+left = False
+right = False
+walkCount = 0
 
+
+def redrawGameWindow():
+    global walkCount
+    win.blit(bg, (0, 0))
+    if walkCount + 1 >= 27:
+        walkCount = 0
+    if left:
+        win.blit(walkLeft[walkCount//3], (x, y))
+        walkCount += 1
+    elif right:
+        win.blit(walkRight[walkCount//3], (x, y))
+        walkCount += 1
+    else:
+        win.blit(char, (x, y))
+    pygame.display.update()
+
+# mainloop
 run = True
 while run:
-    pygame.time.delay(50)
+    clock.tick(27)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -26,13 +60,17 @@ while run:
 
     if keys[pygame.K_LEFT] and x > vel:
         x -= vel
-    if keys[pygame.K_RIGHT] and x < 500 - width:
+        left = True
+        right = False
+    elif keys[pygame.K_RIGHT] and x < 500 - width:
         x += vel
+        left = False
+        right = True
+    else:
+        left = False
+        right = False
+        walkCount = 0
     if not isJump:
-        if keys[pygame.K_UP] and y > vel:
-            y -= vel
-        if keys[pygame.K_DOWN] and y < 500 - height:
-            y += vel
         # jump mechanic
         if keys[pygame.K_SPACE]:
             isJump = True
@@ -47,9 +85,6 @@ while run:
             isJump = False
             jumpCount = 10
 
-    win.fill((0, 0, 0))
-
-    pygame.draw.rect(win, (255, 0, 0), (x, y, width, height))
-    pygame.display.update()
+    redrawGameWindow()
 
 pygame.quit()
