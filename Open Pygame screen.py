@@ -1,9 +1,12 @@
 import pygame
 pygame.init()
 
-win = pygame.display.set_mode((500, 500))
+screen_width = 500
+screen_height = 500
 
-pygame.display.set_caption("Tic Tac Toe")
+win = pygame.display.set_mode((screen_width, screen_height))
+
+pygame.display.set_caption("Game Name")
 
 run = True
 while run:

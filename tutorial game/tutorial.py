@@ -1,7 +1,9 @@
 import pygame
 pygame.init()
 
-win = pygame.display.set_mode((500, 480))
+screen_width = 500
+screen_height = 480
+win = pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption("Tic Tac Toe")
 
@@ -32,7 +34,7 @@ right = False
 walkCount = 0
 
 
-def redrawGameWindow():
+def redraw_game_window():
     global walkCount
     win.blit(bg, (0, 0))
     if walkCount + 1 >= 27:
@@ -46,6 +48,7 @@ def redrawGameWindow():
     else:
         win.blit(char, (x, y))
     pygame.display.update()
+
 
 # mainloop
 run = True
@@ -85,6 +88,6 @@ while run:
             isJump = False
             jumpCount = 10
 
-    redrawGameWindow()
+    redraw_game_window()
 
 pygame.quit()
