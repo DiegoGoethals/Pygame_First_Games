@@ -25,6 +25,8 @@ class Player:
         self.right = False
         self.walkCount = 0
         self.standing = True
+        self.hitbox = (self.x + 17, self.y + 11, 29, 52)
+        self.shootLoop = 0
 
     def draw(self, win):
         walkRight = [pygame.image.load('Images/Player/R1.png'), pygame.image.load('Images/Player/R2.png'),
@@ -53,17 +55,21 @@ class Player:
                 win.blit(walkRight[0], (self.x, self.y))
             else:
                 win.blit(walkLeft[0], (self.x, self.y))
+        self.hitbox = (self.x + 17, self.y + 11, 29, 52)
+        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
     def move(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.shootLoop == 0:
             if self.left:
                 facing = -1
             else:
                 facing = 1
             if len(bullets) < 5:
                 bullets.append(Projectile(round(self.x + self.width // 2), round(self.y + self.height // 2), 6, (0, 0, 0), facing))
+
+            self.shootLoop = 1
 
         if keys[pygame.K_LEFT] and self.x > self.vel:
             self.x -= self.vel
@@ -131,6 +137,7 @@ class Enemy:
         self.path = [self.x, self.end]
         self.walkCount = 0
         self.vel = 3
+        self.hitbox = (self.x + 17, self.y + 2, 31, 57)
 
     def draw(self, win):
         self.move()
@@ -142,6 +149,8 @@ class Enemy:
         else:
             win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
             self.walkCount += 1
+        self.hitbox = (self.x + 17, self.y + 2, 31, 57)
+        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
     def move(self):
         if self.vel > 0:
@@ -156,6 +165,10 @@ class Enemy:
             else:
                 self.vel *= -1
                 self.walkCount = 0
+
+    def hit(self):
+        print('hit')
+        pass
 
 
 def redraw_game_window():
@@ -175,11 +188,20 @@ run = True
 while run:
     clock.tick(27)
 
+    if player.shootLoop > 0:
+        player.shootLoop += 1
+    if player.shootLoop > 3:
+        player.shootLoop = 0
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for bullet in bullets:
+        if bullet.y - bullet.radius < enemy.hitbox[1] + enemy.hitbox[3] and bullet.y + bullet.radius > enemy.hitbox[1]:
+            if bullet.x + bullet.radius > enemy.hitbox[0] and bullet.x - bullet.radius < enemy.hitbox[0] + enemy.hitbox[2]:
+                enemy.hit()
+                bullets.pop(bullets.index(bullet))
         if screen_width > bullet.x > 0:
             bullet.x += bullet.vel
         else:
